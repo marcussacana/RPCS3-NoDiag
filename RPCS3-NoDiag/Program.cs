@@ -29,6 +29,11 @@ namespace RPCS3_NoDiag {
                     Console.WriteLine("[2] Patching At {0:X8}", i + 3);
                     EXE[i + 3] = 0x85;
                 }
+                if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xF7, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                    Patchs++;
+                    Console.WriteLine("[3] Patching At {0:X8}", i + 3);
+                    EXE[i + 3] = 0x85;
+                }
             }
 
             if (Patchs != 1) {

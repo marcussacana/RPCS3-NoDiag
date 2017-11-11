@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace RPCS3_NoDiag {
     class Program {
+        static byte[] Unks = new byte[] {
+            0x84, 0x85, 0xF6, 0xF7
+        };
         static void Main(string[] args) {
             if (args.Length == 0) {
                 Console.WriteLine("Drag&Drop the RPCS3 Executable");
@@ -19,28 +20,23 @@ namespace RPCS3_NoDiag {
             uint Patchs = 0;
 
             for (uint i = 0; i < EXE.LongLength; i++) {
-                if (EqualsAt(EXE, new byte[] { 0x85, 0xDB, 0x0F, 0x84, 0x85, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                    Patchs++;
-                    Console.WriteLine("[1] Patching At {0:X8}", i + 3);
-                    EXE[i + 3] = 0x85;
-                }
-                if (EqualsAt(EXE, new byte[] { 0x85, 0xDB, 0x0F, 0x84, 0xF6, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                    Patchs++;
-                    Console.WriteLine("[2] Patching At {0:X8}", i + 3);
-                    EXE[i + 3] = 0x85;
-                }
-                if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xF7, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                    Patchs++;
-                    Console.WriteLine("[3] Patching At {0:X8}", i + 3);
-                    EXE[i + 3] = 0x85;
-                }
-                if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xF6, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                    Patchs++;
-                    Console.WriteLine("[4] Patching At {0:X8}", i + 3);
-                    EXE[i + 3] = 0x85;
+                if (EXE[i] == 0x85) {
+                    if (EqualsAt(EXE, new byte[] { 0x85, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        Patchs++;
+                        Console.WriteLine("[X1] Patching At {0:X8}", i + 3);
+                        EXE[i + 3] = 0x85;
+                        break;
+                    }
+                } else if (EXE[i] == 0x84) {
+                    if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        Patchs++;
+                        Console.WriteLine("[X2] Patching At {0:X8}", i + 3);
+                        EXE[i + 3] = 0x85;
+                        break;
+                    }
                 }
             }
-
+            
             if (Patchs != 1) {
                 Console.WriteLine("Failed to Patch...");
             }
@@ -50,13 +46,16 @@ namespace RPCS3_NoDiag {
             File.WriteAllBytes(args[0], EXE);
             Console.ReadKey();
         }
-
+       
         private static bool EqualsAt(byte[] Data, byte[] DataToCompare, uint At) {
             if (DataToCompare.Length + At >= Data.Length)
                 return false;
-            for (uint i = 0; i < DataToCompare.LongLength; i++)
+            for (uint i = 0; i < DataToCompare.LongLength; i++) {
+                if (DataToCompare[i] == 0xFF && Unks.Contains(Data[i + At]))
+                    continue;
                 if (Data[i + At] != DataToCompare[i])
                     return false;
+            }
             return true;
         }
     }

@@ -5,7 +5,7 @@ using System.Linq;
 namespace RPCS3_NoDiag {
     class Program {
         static byte[] Unks = new byte[] {
-            0x84, 0x85, 0xF6, 0xF7
+            0x84, 0x85, 0xF6, 0xF7, 0x80
         };
         static void Main(string[] args) {
             if (args.Length == 0) {
@@ -19,9 +19,11 @@ namespace RPCS3_NoDiag {
             File.Delete(args[0]);
             uint Patchs = 0;
 
-            for (uint i = 0; i < EXE.LongLength; i++) {
+            for (uint i = 10; i < EXE.LongLength; i++) {
                 if (EXE[i] == 0x85) {
                     if (EqualsAt(EXE, new byte[] { 0x85, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8))
+                            continue;
                         Patchs++;
                         Console.WriteLine("[X1] Patching At {0:X8}", i + 3);
                         EXE[i + 3] = 0x85;
@@ -29,6 +31,8 @@ namespace RPCS3_NoDiag {
                     }
                 } else if (EXE[i] == 0x84) {
                     if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8))
+                            continue;
                         Patchs++;
                         Console.WriteLine("[X2] Patching At {0:X8}", i + 3);
                         EXE[i + 3] = 0x85;

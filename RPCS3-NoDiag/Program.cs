@@ -5,7 +5,7 @@ using System.Linq;
 namespace RPCS3_NoDiag {
     class Program {
         static byte[] Unks = new byte[] {
-            0x84, 0x85, 0xF6, 0xF7, 0x80, 0xA3
+            0x84, 0x85, 0xF6, 0xF7, 0x80, 0xA3, 0xA7
         };
         static void Main(string[] args) {
             if (args.Length == 0) {

@@ -5,7 +5,9 @@ using System.Linq;
 namespace RPCS3_NoDiag {
     class Program {
         static byte[] Unks = new byte[] {
-            0x84, 0x85, 0xF6, 0xF7, 0x80, 0xA3, 0xA4, 0xA7
+            0x84, 0x85, 0xF6, 0xF7, 0x80, 0xA3, 0xA4, 0xA7,
+
+            0xDB, 0xE4
         };
         static void Main(string[] args) {
             if (args.Length == 0) {
@@ -21,8 +23,8 @@ namespace RPCS3_NoDiag {
 
             for (uint i = 10; i < EXE.LongLength; i++) {
                 if (EXE[i] == 0x85) {
-                    if (EqualsAt(EXE, new byte[] { 0x85, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8))
+                    if (EqualsAt(EXE, new byte[] { 0x85, 0xFF, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8) && !EqualsAt(EXE, new byte[] { 0x49 }, i - 9))
                             continue;
                         Patchs++;
                         Console.WriteLine("[X1] Patching At {0:X8}", i + 3);
@@ -30,8 +32,8 @@ namespace RPCS3_NoDiag {
                         break;
                     }
                 } else if (EXE[i] == 0x84) {
-                    if (EqualsAt(EXE, new byte[] { 0x84, 0xDB, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
-                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8))
+                    if (EqualsAt(EXE, new byte[] { 0x84, 0xFF, 0x0F, 0x84, 0xFF, 0x01, 0x00, 0x00, 0x8B }, i)) {
+                        if (!EqualsAt(EXE, new byte[] { 0x48 }, i - 8) && !EqualsAt(EXE, new byte[] { 0x49 }, i - 9))
                             continue;
                         Patchs++;
                         Console.WriteLine("[X2] Patching At {0:X8}", i + 3);
